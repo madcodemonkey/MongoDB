@@ -17,7 +17,7 @@ If you want to look into the MongoDB running in the docker container, you can [d
 
 You can get the connection string from the Atlas portal. It will look something like this
 ```
-"mongodb+srv://[userName]:[Password]@[yourclusteranem].[alphaNumberic].mongodb.net/"
+"mongodb+srv://[userName]:[Password]@[yourclustername].[alphaNumberic].mongodb.net/"
 ```
 
 # Documenation
