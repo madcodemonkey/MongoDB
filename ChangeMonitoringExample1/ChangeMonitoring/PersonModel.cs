@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Example1;
+namespace ChangeMonitoring;
 
 public class PersonModel
 {

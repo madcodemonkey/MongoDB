@@ -5,7 +5,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <UserSecretsId>23012925-5ac1-476f-a4c8-a6961b6d0a06</UserSecretsId>
+    <UserSecretsId>96d0bdea-1be1-4e67-a237-edf5df30376a</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,11 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EditorConfigFiles Remove="C:\Yates-Playground\MongoFun\Example1\Example1\.editorconfig" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Example1.DataAccess\Example1.DataAccess.csproj" />
+    <EditorConfigFiles Remove="C:\Yates-Github\MongoDB\ChangeMonitoringExample1\ChangeMonitoring\.editorconfig" />
   </ItemGroup>
 
   <ItemGroup>

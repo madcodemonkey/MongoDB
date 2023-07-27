@@ -1,19 +1,29 @@
-﻿using MongoDB.Driver;
+﻿using Microsoft.Extensions.Configuration;
+using MongoDB.Driver;
 
 namespace Example1.DataAccess;
 
 public class ChoreDataAccess
 {
-    private const string ConnectionString = "mongodb://root:example@localhost:27017";
+    private readonly string _connectionString;
     private const string DatabaseName = "choredb";
     private const string ChoreCollection = "chore_chart";
     private const string UserCollection = "users";
     private const string ChoreHistoryCollection = "chore_history";
 
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    public ChoreDataAccess(IConfiguration config)
+    {
+        _connectionString = config["mongoDbConnectionString"];
+    }
+
+
 
     private IMongoCollection<T> ConnectionToMongo<T>(in string collection)
     {
-        var client = new MongoClient(ConnectionString);
+        var client = new MongoClient(_connectionString);
         var db = client.GetDatabase(DatabaseName);
         return db.GetCollection<T>(collection);
     }
@@ -43,6 +53,13 @@ public class ChoreDataAccess
     {
         var usersCollection = ConnectionToMongo<UserModel>(UserCollection);
         await usersCollection.InsertOneAsync(user);
+    }
+
+    public async Task<bool> UserExistsAsync(string id)
+    {
+        var usersCollection = ConnectionToMongo<UserModel>(UserCollection);
+        long numberOfHits = await usersCollection.CountDocumentsAsync(w => w.Id == id, new CountOptions { Limit = 1 });
+        return numberOfHits > 0;
     }
 
     public async Task CreateChoreAsync(ChoreModel chore)
