@@ -47,6 +47,7 @@ static async Task MonitorOneDatabasesAsync(IMongoClient client, string monitorDa
         // Delete doesn't send the full document!
         if (changeItem.FullDocument != null)
         {
+            // Show all the fields on the document.
             foreach (string name in changeItem.FullDocument.Names)
             {
                 Console.WriteLine($"  {name}: {changeItem.FullDocument[name]}");
