@@ -44,6 +44,8 @@ public static class ServiceCollectionExtensions
             return mongoClient.GetDatabase(options.DatabaseName);
         });
 
+        BsonDefaults.GuidRepresentation = GuidRepresentation.Standard;
+
         // This doesn't appear to be necessary
         // https://www.mongodb.com/docs/drivers/csharp/current/fundamentals/serialization/guid-serialization/#guids
         //BsonDefaults.GuidRepresentationMode = GuidRepresentationMode.V3;
@@ -68,16 +70,19 @@ public static class ServiceCollectionExtensions
     {
         // TODO:  Look into class registration
         // TODO:  How to setup indexes
-        BsonClassMap.RegisterClassMap<PersonModel>(cm =>
+        if (BsonClassMap.IsClassMapRegistered(typeof(PersonModel)) == false)
         {
-            cm.AutoMap();
+            BsonClassMap.RegisterClassMap<PersonModel>(cm =>
+            {
+                cm.AutoMap();
 
-            cm.MapMember(p => p.Id).SetIsRequired(true);
-            cm.MapMember(p => p.CreatedAtUtc).SetIsRequired(true);
+                cm.MapMember(p => p.Id).SetIsRequired(true);
+                cm.MapMember(p => p.CreatedAtUtc).SetIsRequired(true);
 
-            cm.SetIgnoreExtraElements(true);
-            cm.MapIdMember(c => c.Id).SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
-        });
+                cm.SetIgnoreExtraElements(true);
+                cm.MapIdMember(c => c.Id).SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
+            });
+        }
     }
 
 

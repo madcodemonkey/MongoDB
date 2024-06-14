@@ -25,6 +25,15 @@ public interface IPersonRepository
     /// <param name="cancellationToken">A cancellation token</param>
     Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default);
 
+
+    /// <summary>
+    /// Checks to see if a person with the same first and last name exists in the repository.
+    /// </summary>
+    /// <param name="firstName">First name to check</param>
+    /// <param name="lastName">Last name to check</param>
+    /// <param name="cancellationToken">A cancellation token</param>
+    Task<bool> ExistsAsync(string firstName, string lastName, CancellationToken cancellationToken = default);
+
     /// <summary>
     /// Gets all the people from the repository.
     /// </summary>

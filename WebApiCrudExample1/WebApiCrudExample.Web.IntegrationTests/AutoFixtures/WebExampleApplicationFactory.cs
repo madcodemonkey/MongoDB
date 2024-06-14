@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Mongo2Go;
 
@@ -10,7 +9,7 @@ namespace WebApiCrudExample.Web.IntegrationTests;
 
 public class WebExampleApplicationFactory : WebApplicationFactory<Program>
 {
-    private readonly MongoDbRunner _mongoDbRunner;
+    private MongoDbRunner? _mongoDbRunner;
 
     public WebExampleApplicationFactory()
     {
@@ -24,15 +23,16 @@ public class WebExampleApplicationFactory : WebApplicationFactory<Program>
             configBuilder.AddInMemoryCollection(new List<KeyValuePair<string, string?>>()
             {
                 // https://stackoverflow.com/a/72031794/97803
-                new KeyValuePair<string, string?>("hostBuilder:reloadConfigOnChange", "false"),
+                new("hostBuilder:reloadConfigOnChange", "false"),
             });
 
         })
         .ConfigureAppConfiguration((hostingContext, configBuilder) =>
         {
-            configBuilder.AddInMemoryCollection(new List<KeyValuePair<string, string?>>()
+            configBuilder.AddInMemoryCollection(new List<KeyValuePair<string, string?>>
             {
-                new KeyValuePair<string, string?>("DatabaseOptions:mongoDbConnectionString", _mongoDbRunner.ConnectionString),
+                new("DatabaseOptions:mongoDbConnectionString", _mongoDbRunner.ConnectionString),
+                new("EnableSwagger", "false")
             });
 
         });
@@ -51,7 +51,11 @@ public class WebExampleApplicationFactory : WebApplicationFactory<Program>
 
     protected override void Dispose(bool disposing)
     {
-        _mongoDbRunner.Dispose();
+        if (_mongoDbRunner != null)
+        {
+            _mongoDbRunner.Dispose();
+            _mongoDbRunner = null;
+        }
         base.Dispose(disposing);
     }
 }

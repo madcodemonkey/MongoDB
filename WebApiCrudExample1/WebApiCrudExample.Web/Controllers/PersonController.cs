@@ -8,20 +8,48 @@ namespace WebApiCrudExample.Controllers
     [Route("[controller]")]
     public class PersonController : ControllerBase
     {
-        private readonly ILogger<PersonController> _logger;
-
-        /// <summary>Constructor</summary>
-        public PersonController(ILogger<PersonController> logger)
-        {
-            _logger = logger;
-        }
-
         [HttpPost]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AddPerson(PersonRequest person,
             [FromServices] PersonAddUseCase useCase, 
             CancellationToken cancellationToken)
         {
             var response = await useCase.AddAsync(person, cancellationToken);
+            return Ok(response);
+        }
+
+        [HttpDelete("{id}")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeletePerson(Guid id,
+            [FromServices] PersonDeleteUseCase useCase,
+            CancellationToken cancellationToken)
+        {
+            await useCase.DeleteAsync(id, cancellationToken);
+            return NoContent();
+        }
+
+        [HttpPut("{id}")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> ReplacePerson(Guid id, PersonRequest person,
+            [FromServices] PersonReplaceUseCase useCase,
+            CancellationToken cancellationToken)
+        {
+            var response = await useCase.ReplaceAsync(id, person, cancellationToken);
+            return Ok(response);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetPeople(
+            [FromServices] PersonGetAllUseCase useCase,
+            CancellationToken cancellationToken)
+        {
+            var response = await useCase.GetAllAsync(cancellationToken);
             return Ok(response);
         }
     }

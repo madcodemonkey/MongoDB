@@ -16,4 +16,10 @@
     <ProjectReference Include="..\WebApiCrudExample.Model\WebApiCrudExample.Model.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

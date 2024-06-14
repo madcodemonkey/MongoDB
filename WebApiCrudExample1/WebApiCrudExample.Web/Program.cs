@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.Rendering;
 using WebApiCrudExample.Web;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,8 +13,10 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+app.UseMiddleware<ExceptionMiddleware>();
+
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>("DisableSwagger"))
+if (app.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>("EnableSwagger"))
 {
     app.UseSwagger();
     app.UseSwaggerUI();

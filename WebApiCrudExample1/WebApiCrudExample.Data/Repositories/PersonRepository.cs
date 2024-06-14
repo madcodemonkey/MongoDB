@@ -60,6 +60,24 @@ public class PersonRepository : IPersonRepository
     }
 
     /// <inheritdoc/>
+    public async Task<bool> ExistsAsync(string firstName, string lastName, CancellationToken cancellationToken = default)
+    {
+        //var existingPerson = await _mongoCollection
+        //    .Find(x => x.FirstName == firstName && x.LastName == lastName)
+        //    .FirstOrDefaultAsync(cancellationToken);
+        //return existingPerson != null;
+
+        var filter = Builders<PersonModel>.Filter.Eq(nameof(PersonModel.FirstName), firstName) &
+                     Builders<PersonModel>.Filter.Eq(nameof(PersonModel.LastName), lastName);
+        
+        var count = await _mongoCollection
+            .Find(filter, new FindOptions { Collation = new Collation("en", strength: CollationStrength.Primary) })
+            .CountDocumentsAsync(cancellationToken);
+
+        return count > 0;
+    }
+
+    /// <inheritdoc/>
     public async Task<ICollection<PersonModel>> GetAsync(CancellationToken cancellationToken = default)
     {
         var filter = Builders<PersonModel>.Filter.Empty;
