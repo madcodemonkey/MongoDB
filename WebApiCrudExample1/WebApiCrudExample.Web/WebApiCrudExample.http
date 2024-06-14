@@ -1,0 +1,11 @@
+@WebApiCrudExample_HostAddress = https://localhost:7265/
+
+POST {{WebApiCrudExample_HostAddress}}/person
+Accept: application/json
+{
+  "FirstName": "John",
+  "LastName": "Doe",
+  "Age": 30
+}
+
+###
