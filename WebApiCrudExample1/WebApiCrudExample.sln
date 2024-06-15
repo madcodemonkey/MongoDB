@@ -21,11 +21,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApiCrudExample.Applicati
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02-App", "02-App", "{B1724FCD-6F3F-4A33-9DD7-623F29EC0BC9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApiCrudExample.Application.UnitTests", "WebApiCrudExample.Application.UnitTests\WebApiCrudExample.Application.UnitTests.csproj", "{30BC9326-33C5-470E-BF03-CFD6E09539DF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApiCrudExample.Application.UnitTests", "WebApiCrudExample.Application.UnitTests\WebApiCrudExample.Application.UnitTests.csproj", "{30BC9326-33C5-470E-BF03-CFD6E09539DF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "00-Solution Items", "00-Solution Items", "{484F5C89-2C8C-4C3F-A7BB-D05C4F7F7CC7}"
 	ProjectSection(SolutionItems) = preProject
-		..\README.md = ..\README.md
+		README.md = README.md
 	EndProjectSection
 EndProject
 Global
