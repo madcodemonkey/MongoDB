@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc.Rendering;
+using WebApiCrudExample.Data.Extensions;
 using WebApiCrudExample.Web;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +12,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+// Used for creating indexes and other MongoDB specific changes
+await app.Services.ApplyMongoDbChangesAsync();
 
 app.UseMiddleware<ExceptionMiddleware>();
 
