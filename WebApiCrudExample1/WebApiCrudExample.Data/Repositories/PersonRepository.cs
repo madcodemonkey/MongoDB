@@ -73,7 +73,7 @@ public class PersonRepository : IPersonRepository
         var filter = Builders<PersonModel>.Filter.Eq(nameof(PersonModel.FirstName), firstName) &
                      Builders<PersonModel>.Filter.Eq(nameof(PersonModel.LastName), lastName);
         
-        var findOptions = CreateCaseInsensitiveFindOptions();
+        var findOptions = new FindOptions { Collation = new Collation("en", strength: CollationStrength.Primary) };
 
         List<PersonModel> items = await _mongoCollection
             .Find(filter, findOptions)
@@ -92,18 +92,26 @@ public class PersonRepository : IPersonRepository
         var filter = Builders<PersonModel>.Filter
             .And(Builders<PersonModel>.Filter.Eq(nameof(PersonModel.Id), id));
 
-        var person = await _mongoCollection.Find(filter)
+        var person = await _mongoCollection
+            .Find(filter)
             .FirstOrDefaultAsync(cancellationToken);
 
         return person;
     }
 
     /// <inheritdoc/>
-    public async Task<ICollection<PersonModel>> GetAsync(CancellationToken cancellationToken = default)
+    public async Task<ICollection<PersonModel>> GetAsync(int limit = 10, CancellationToken cancellationToken = default)
     {
         var filter = Builders<PersonModel>.Filter.Empty;
 
-        var personList = await _mongoCollection.Find(filter).ToListAsync(cancellationToken);
+        // https://stackoverflow.com/a/73262796/97803
+        var sort = Builders<PersonModel>.Sort.Ascending(nameof(PersonModel.FirstName));
+
+        var personList = await _mongoCollection
+            .Find(filter)
+            .Sort(sort)
+            .Limit(limit)
+            .ToListAsync(cancellationToken);
 
         return personList ?? new List<PersonModel>(0);
     }

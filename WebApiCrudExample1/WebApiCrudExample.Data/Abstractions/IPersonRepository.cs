@@ -49,10 +49,11 @@ public interface IPersonRepository
     Task<PersonModel?> GetAsync(Guid id, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Gets all the people from the repository.
+    /// Gets all the people from the repository.  Sorted by first name.
     /// </summary>
+    /// <param name="limit">The maximum number of items to return</param>
     /// <param name="cancellationToken">A cancellation token</param>
-    Task<ICollection<PersonModel>> GetAsync(CancellationToken cancellationToken = default);
+    Task<ICollection<PersonModel>> GetAsync(int limit = 10, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Updates a person in the repository.

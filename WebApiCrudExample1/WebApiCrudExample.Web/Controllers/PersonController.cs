@@ -40,7 +40,7 @@ namespace WebApiCrudExample.Controllers
             [FromServices] PersonGetAllUseCase useCase,
             CancellationToken cancellationToken)
         {
-            var response = await useCase.GetAllAsync(cancellationToken);
+            var response = await useCase.GetAllAsync(limit: 100, cancellationToken);
             return Ok(response);
         }
 

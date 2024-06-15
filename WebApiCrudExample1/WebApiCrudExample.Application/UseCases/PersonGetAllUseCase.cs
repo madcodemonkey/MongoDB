@@ -16,9 +16,9 @@ public class PersonGetAllUseCase
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<PersonResponse>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<PersonResponse>> GetAllAsync(int limit = 10, CancellationToken cancellationToken = default)
     {
-        var people = await _personRepository.GetAsync(cancellationToken);
+        var people = await _personRepository.GetAsync(limit, cancellationToken);
         return _mapper.Map<IEnumerable<PersonResponse>>(people);
     }
 }
