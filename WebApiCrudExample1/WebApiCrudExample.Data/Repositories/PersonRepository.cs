@@ -33,6 +33,56 @@ public class PersonRepository : IPersonRepository
     }
 
     /// <inheritdoc/>
+    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var filter = Builders<PersonModel>.Filter.Eq(nameof(PersonModel.Id), id);
+
+        await _mongoCollection.DeleteOneAsync(filter, cancellationToken);
+    }
+
+    /// <inheritdoc/>
+    public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        // https://www.mongodb.com/docs/drivers/csharp/current/fundamentals/crud/read-operations/count/#accurate-count
+        var filter = Builders<PersonModel>.Filter
+            .And(Builders<PersonModel>.Filter.Eq(nameof(PersonModel.Id), id));
+
+        var numberOfDocs = await _mongoCollection.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
+
+        return numberOfDocs > 0;
+    }
+
+    /// <inheritdoc/>
+    public async Task<bool> ExistsAsync(string firstName, string lastName, CancellationToken cancellationToken = default)
+    {
+        var filter = Builders<PersonModel>.Filter.Eq(nameof(PersonModel.FirstName), firstName) &
+                     Builders<PersonModel>.Filter.Eq(nameof(PersonModel.LastName), lastName);
+
+        var findOptions = CreateCaseInsensitiveFindOptions();
+
+        var count = await _mongoCollection
+            .Find(filter, findOptions)
+            .CountDocumentsAsync(cancellationToken);
+
+        return count > 0;
+    }
+
+    /// <inheritdoc/>
+    public async Task<List<PersonModel>> FindByNameAsync(string firstName, string lastName, CancellationToken cancellationToken = default)
+    {
+        var filter = Builders<PersonModel>.Filter.Eq(nameof(PersonModel.FirstName), firstName) &
+                     Builders<PersonModel>.Filter.Eq(nameof(PersonModel.LastName), lastName);
+        
+        var findOptions = CreateCaseInsensitiveFindOptions();
+
+        List<PersonModel> items = await _mongoCollection
+            .Find(filter, findOptions)
+            .ToListAsync(cancellationToken);
+
+        return items;
+    }
+
+    /// <inheritdoc/>
     public async Task<PersonModel?> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {
         // https://www.mongodb.com/docs/drivers/csharp/current/fundamentals/crud/read-operations/retrieve/
@@ -42,39 +92,10 @@ public class PersonRepository : IPersonRepository
         var filter = Builders<PersonModel>.Filter
             .And(Builders<PersonModel>.Filter.Eq(nameof(PersonModel.Id), id));
 
-        var person = await _mongoCollection.Find(filter).FirstOrDefaultAsync(cancellationToken);
+        var person = await _mongoCollection.Find(filter)
+            .FirstOrDefaultAsync(cancellationToken);
 
         return person;
-    }
-
-    /// <inheritdoc/>
-    public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default)
-    {
-        // https://www.mongodb.com/docs/drivers/csharp/current/fundamentals/crud/read-operations/count/#accurate-count
-        var filter = Builders<PersonModel>.Filter
-            .And(Builders<PersonModel>.Filter.Eq(nameof(PersonModel.Id), id));
-        
-        var numberOfDocs = await _mongoCollection.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
-
-        return numberOfDocs > 0;
-    }
-
-    /// <inheritdoc/>
-    public async Task<bool> ExistsAsync(string firstName, string lastName, CancellationToken cancellationToken = default)
-    {
-        //var existingPerson = await _mongoCollection
-        //    .Find(x => x.FirstName == firstName && x.LastName == lastName)
-        //    .FirstOrDefaultAsync(cancellationToken);
-        //return existingPerson != null;
-
-        var filter = Builders<PersonModel>.Filter.Eq(nameof(PersonModel.FirstName), firstName) &
-                     Builders<PersonModel>.Filter.Eq(nameof(PersonModel.LastName), lastName);
-        
-        var count = await _mongoCollection
-            .Find(filter, new FindOptions { Collation = new Collation("en", strength: CollationStrength.Primary) })
-            .CountDocumentsAsync(cancellationToken);
-
-        return count > 0;
     }
 
     /// <inheritdoc/>
@@ -99,11 +120,24 @@ public class PersonRepository : IPersonRepository
         return person;
     }
 
-    /// <inheritdoc/>
-    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+    /// <summary>
+    /// Creates a FindOptions object that will make the search case-insensitive.
+    /// </summary>
+    /// <remarks>
+    /// Note 1: A strength of 1 (primary) makes this a case-insensitive search. The documentation states:
+    ///         "Primary level of comparison. Collation performs comparisons of the base characters only,
+    ///          ignoring other differences such as diacritics and CASE."
+    ///          See https://www.mongodb.com/docs/manual/reference/method/cursor.collation/
+    /// Note 2:  Diacritics is a sign, such as an accent or cedilla, which when written above or below a
+    ///          letter indicates a difference in pronunciation from the same letter when unmarked or differently marked
+    /// </remarks>
+    private static FindOptions CreateCaseInsensitiveFindOptions()
     {
-        var filter = Builders<PersonModel>.Filter.Eq(nameof(PersonModel.Id), id);
+        var result = new FindOptions
+        {
+            Collation = new Collation("en", strength: CollationStrength.Primary)
+        };
 
-        await _mongoCollection.DeleteOneAsync(filter, cancellationToken);
+        return result;
     }
 }

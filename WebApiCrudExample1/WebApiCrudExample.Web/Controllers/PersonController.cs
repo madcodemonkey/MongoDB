@@ -10,7 +10,7 @@ namespace WebApiCrudExample.Controllers
     {
         [HttpPost]
         [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PersonResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AddPerson(PersonRequest person,
             [FromServices] PersonAddUseCase useCase, 
@@ -32,6 +32,18 @@ namespace WebApiCrudExample.Controllers
             return NoContent();
         }
 
+        [HttpGet]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetPeople(
+            [FromServices] PersonGetAllUseCase useCase,
+            CancellationToken cancellationToken)
+        {
+            var response = await useCase.GetAllAsync(cancellationToken);
+            return Ok(response);
+        }
+
         [HttpPut("{id}")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -44,13 +56,6 @@ namespace WebApiCrudExample.Controllers
             return Ok(response);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetPeople(
-            [FromServices] PersonGetAllUseCase useCase,
-            CancellationToken cancellationToken)
-        {
-            var response = await useCase.GetAllAsync(cancellationToken);
-            return Ok(response);
-        }
+ 
     }
 }

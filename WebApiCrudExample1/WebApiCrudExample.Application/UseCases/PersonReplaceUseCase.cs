@@ -29,13 +29,23 @@ public class PersonReplaceUseCase
 
         if (existingPerson.FirstName != request.FirstName || existingPerson.LastName != request.LastName)
         {
-            if (await _personRepository.ExistsAsync(request.FirstName, request.LastName, cancellationToken))
+            List<PersonModel> foundUsers = await _personRepository.FindByNameAsync(request.FirstName, request.LastName, cancellationToken);
+            if (foundUsers.Count > 2)
             {
-                throw new BadRequestUserException("Person already exists.", new Dictionary<string, string>
+                throw new Exception("More than one person has the same name.  This should not be possible!");
+            }
+            
+            if (foundUsers.Count == 1)
+            {
+                // Your allowed to update your own record.  We just don't want two people with the same name.
+                if (foundUsers[0].Id != id)
                 {
-                    {nameof(PersonRequest.FirstName), "Person with first name and last name already exists."},
-                    {nameof(PersonRequest.LastName), "Person with first name and last name already exists."}
-                });
+                    throw new BadRequestUserException("Person already exists.", new Dictionary<string, string>
+                    {
+                        {nameof(PersonRequest.FirstName), "Person with first name and last name already exists."},
+                        {nameof(PersonRequest.LastName), "Person with first name and last name already exists."}
+                    });
+                }
             }
         }
         
