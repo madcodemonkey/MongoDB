@@ -9,7 +9,7 @@ using WebApiCrudExample.Model;
 namespace WebApiCrudExample.Web.IntegrationTests;
 
 [TestClass]
-public class PersonController_ReplacePerson_Method_Tests
+public class WebApplicationFactory_PersonController_ReplacePerson_Method_Tests
 {
     [TestMethod]
     public async Task ReplacePerson_UserIsUpdated_WhenAgeIsChanged()

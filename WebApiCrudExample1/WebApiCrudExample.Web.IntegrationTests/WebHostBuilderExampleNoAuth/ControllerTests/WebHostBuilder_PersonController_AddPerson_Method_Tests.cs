@@ -9,13 +9,13 @@ using WebApiCrudExample.Model;
 namespace WebApiCrudExample.Web.IntegrationTests;
 
 [TestClass]
-public class PersonController_AddPerson_Method_Tests
+public class WebHostBuilder_PersonController_AddPerson_Method_Tests
 {
     [TestMethod]
     public async Task AddPerson_UserIsAdded_WhenAddIsCalled()
     {
         // Arrange
-        using var fixture = new WebExampleApplicationFixture();
+        using var fixture = new WebExampleWebHostBuilderFixture();
 
         var context = JsonContent.Create(new PersonRequest
         {
@@ -24,8 +24,10 @@ public class PersonController_AddPerson_Method_Tests
             Age = 34
         });
 
+        var client = fixture.GetTestClient();
+
         // Act
-        var result = await fixture.TestHttpClient.PostAsync("/person", context);
+        var result = await client.PostAsync("/person", context);
 
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -36,7 +38,7 @@ public class PersonController_AddPerson_Method_Tests
         personResponse.LastName.Should().Be("Doe");
 
         // Make sure the person was added to the database
-        var mongoCollection = fixture.TestServiceProvider.GetRequiredService<IMongoCollection<PersonModel>>();
+        var mongoCollection = fixture.Services.GetRequiredService<IMongoCollection<PersonModel>>();
         var person = await mongoCollection.Find(x => x.FirstName == "John" && x.LastName == "Doe").FirstOrDefaultAsync();
         person.Should().NotBeNull();
         person.FirstName.Should().Be("John");
@@ -47,7 +49,7 @@ public class PersonController_AddPerson_Method_Tests
     public async Task AddPerson_AddingPersonWithSameFirstAndLastName_ResultsInBadRequest()
     {
         // Arrange
-        using var fixture = new WebExampleApplicationFixture();
+        using var fixture = new WebExampleWebHostBuilderFixture();
 
         var context = JsonContent.Create(new PersonRequest
         {
@@ -56,12 +58,15 @@ public class PersonController_AddPerson_Method_Tests
             Age = 34
         });
 
+        var client = fixture.GetTestClient();
+
+
         // Adding the person the first time should be successful
-        var resultFirstTime = await fixture.TestHttpClient.PostAsync("/person", context);
+        var resultFirstTime = await client.PostAsync("/person", context);
         resultFirstTime.StatusCode.Should().Be(HttpStatusCode.OK);
 
         // Act
-        var resultSecondTime = await fixture.TestHttpClient.PostAsync("/person", context);
+        var resultSecondTime = await client.PostAsync("/person", context);
 
         // Assert
         resultSecondTime.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -78,7 +83,7 @@ public class PersonController_AddPerson_Method_Tests
     public async Task AddPerson_NotSpecifyingFirstName_ResultsInBadRequest(string firstName)
     {
         // Arrange
-        using var fixture = new WebExampleApplicationFixture();
+        using var fixture = new WebExampleWebHostBuilderFixture();
 
         var context = JsonContent.Create(new PersonRequest
         {
@@ -87,8 +92,11 @@ public class PersonController_AddPerson_Method_Tests
             Age = 34
         });
 
+        var client = fixture.GetTestClient();
+
+
         // Act
-        var result = await fixture.TestHttpClient.PostAsync("/person", context);
+        var result = await client.PostAsync("/person", context);
 
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -104,7 +112,7 @@ public class PersonController_AddPerson_Method_Tests
     public async Task AddPerson_NotSpecifyingLastName_ResultsInBadRequest(string lastName)
     {
         // Arrange
-        using var fixture = new WebExampleApplicationFixture();
+        using var fixture = new WebExampleWebHostBuilderFixture();
 
         var context = JsonContent.Create(new PersonRequest
         {
@@ -113,8 +121,11 @@ public class PersonController_AddPerson_Method_Tests
             Age = 34
         });
 
+        var client = fixture.GetTestClient();
+
+
         // Act
-        var result = await fixture.TestHttpClient.PostAsync("/person", context);
+        var result = await client.PostAsync("/person", context);
 
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
