@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.Features;
 using WebApiCrudExample.Data.Extensions;
 using WebApiCrudExample.Web;
 
@@ -11,12 +12,24 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddProblemDetails(options =>
+    {
+        options.CustomizeProblemDetails = context =>
+        {
+            context.ProblemDetails.Instance = $"{context.HttpContext.Request.Method} {context.HttpContext.Request.Path}";
+            context.ProblemDetails.Extensions.TryAdd("requestId", context.HttpContext.TraceIdentifier);
+
+            var activity = context.HttpContext.Features.Get<IHttpActivityFeature>()?.Activity;
+            context.ProblemDetails.Extensions.TryAdd("traceId", activity?.Id);
+        };
+    }
+);
+builder.Services.AddExceptionHandler<MyCustomExceptionHandler>();
+
 var app = builder.Build();
 
 // Used for creating indexes and other MongoDB specific changes
 await app.Services.ApplyMongoDbChangesAsync();
-
-app.UseMiddleware<ExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>("EnableSwagger"))
@@ -24,6 +37,8 @@ if (app.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>("Ena
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
 

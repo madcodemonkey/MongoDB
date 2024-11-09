@@ -4,9 +4,9 @@ namespace WebApiCrudExample.Model;
 
 public class BadRequestUserException : UserException
 {
-    public BadRequestUserException(string title) : base(title) { }
+    public BadRequestUserException(string message) : base("Bad Request", message) { }
 
-    public BadRequestUserException(string title, Dictionary<string, string> errors) : base(title, errors) { }
+    public BadRequestUserException(string message, Dictionary<string, string> errors) : base("Bad Request", message, errors) { }
 
     public override HttpStatusCode StatusCode => HttpStatusCode.BadRequest;
 
